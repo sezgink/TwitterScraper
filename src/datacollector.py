@@ -6,8 +6,6 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.webdriver import WebDriver
 
 driver = webdriver.GetWebdriver()
-# driver.get("https://twitter.com/sezginsertan")
-# driver.get("https://twitter.com/elonmusk")
     
 date_for_deletion = '2022-05-21'
 stop_condition = 50
