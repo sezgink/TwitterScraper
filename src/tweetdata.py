@@ -1,7 +1,7 @@
 import datetime
 
-class Tweetdata:
-    def __init__(username:str,text:str,tweetDate:str):
+class TweetData:
+    def __init__(username:str,text:str,tweetDate:datetime.datetime):
         self.username = username
         self.text = text
         self.tweetDate = tweetDate
