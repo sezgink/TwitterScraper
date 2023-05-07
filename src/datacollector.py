@@ -43,7 +43,9 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
                     # print("Datetime is:"+dateFromString.strftime("%Y-%m-%d %H:%M:%S")))
                     # tweetData = TweetData(senderName.text,tweetText.text,dateFromString)
                     # tweetDatas.append(tweetData)
-                    new_tweet = {'username':senderName.text,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S")}
+                    username = senderName.text
+                    username = username.replace("@","")
+                    new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S")}
                     tweets_df = pd.concat([tweets_df,pd.DataFrame([new_tweet])],ignore_index = True)
                     
             except Exception:
@@ -65,7 +67,6 @@ def GetTweetsFromUser(driver : WebDriver,username : str):
     except:
         print("An exception occured")
 
-# GetTweetsFromUser(driver,"elonmusk")
 GetTweetsFromUser(driver,"elonmusk") 
 
 def GetTweetsFromURL(driver,url):
