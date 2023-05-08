@@ -4,7 +4,6 @@ import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.webdriver import WebDriver
-from tweetdata import TweetData
 import datetime
 import pandas as pd
 
@@ -19,7 +18,6 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
     time.sleep(1)
     foundTweetCount=0
 
-    tweetDatas=[]
     column_names = ['username', 'tweet_text', 'tweet_date']
     tweets_df = pd.DataFrame(columns=column_names)
     for i in range(999):
@@ -38,11 +36,7 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
                 if (tweetText != None):
                     foundTweetCount += 1
                     print("Found tweet count "+str(foundTweetCount))
-                    # print(date,tm,statusLink,senderName.text, tweetText.text.replace('\n',''))
                     dateFromString = datetime.datetime.strptime(date+" "+tm,"%Y-%m-%d %H:%M:%S.%fZ")
-                    # print("Datetime is:"+dateFromString.strftime("%Y-%m-%d %H:%M:%S")))
-                    # tweetData = TweetData(senderName.text,tweetText.text,dateFromString)
-                    # tweetDatas.append(tweetData)
                     username = senderName.text
                     username = username.replace("@","")
                     new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S")}
@@ -56,18 +50,20 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
         driver.execute_script('var element = arguments[0]; element.remove();', tweets[0])
         if foundTweetCount >= stop_condition:
             break
-        
-    print(tweets_df.head(5))
     return tweets_df
 
-def GetTweetsFromUser(driver : WebDriver,username : str):
-    driver.get(f"https://twitter.com/{username}")
+def GetTweetsFromUser(driver : WebDriver,username : str,onlyuser : bool):  
     try:
-        ScrapeTweets(driver,20)
+        driver.get(f"https://twitter.com/{username}")
+        tweets_df = ScrapeTweets(driver,20)
+        if(onlyuser):
+            tweets_df = tweets_df[tweets_df.username==username]
+            tweets_df = tweets_df.reset_index(drop=True)
+        print(tweets_df.head(10))
     except:
         print("An exception occured")
 
-GetTweetsFromUser(driver,"elonmusk") 
+GetTweetsFromUser(driver,"elonmusk",False) 
 
 def GetTweetsFromURL(driver,url):
     driver.get("https://twitter.com/elonmusk")
