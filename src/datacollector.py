@@ -24,6 +24,10 @@ def CountFromText(countText:str):
             multiplier=1000000
     countText = countText.replace("K","")
     countText = countText.replace("M","")
+    
+    if countText=="":
+        return int(0)
+
     count =float(countText)
     count*=multiplier
     return int(count)
@@ -34,7 +38,8 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
     foundTweetCount=0
 
     # column_names = ['username', 'tweet_text', 'tweet_date']
-    column_names = ['username', 'tweet_text', 'tweet_date','tweet_like_count','tweet_reply_count','tweet_retweet_count']
+    # column_names = ['username', 'tweet_text', 'tweet_date','tweet_like_count','tweet_reply_count','tweet_retweet_count','tweet_transition_count','tweet_status_link']
+    column_names = ['username', 'tweet_text', 'tweet_date','tweet_like_count','tweet_reply_count','tweet_retweet_count','tweet_transition_count']
 
     tweets_df = pd.DataFrame(columns=column_names)
     for i in range(999):
@@ -51,6 +56,7 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
                 statusLink = tweets[0].find_element(By.XPATH, './/time').find_element(By.XPATH,"..").get_attribute("href")
 
                 fetched_statistics = False
+                tweet_statistics = {}
                 try:
                     replyCount = tweets[0].find_element(By.CSS_SELECTOR, 'div[data-testid=reply]').text
                     replyCountNum = CountFromText(replyCount)
@@ -58,12 +64,22 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
                     retweetCountNum = CountFromText(retweetCount)
                     likeCount = tweets[0].find_element(By.CSS_SELECTOR, 'div[data-testid=like]').text
                     likeCountNum = CountFromText(likeCount)
-                    print(replyCountNum,replyCountNum,likeCountNum)
+                    transitionCountNum = 0
+                    try:
+                        transitionCount = tweets[0].find_element(By.CSS_SELECTOR, 'span[data-testid=app-text-transition-container]').text
+                        transitionCountNum = CountFromText(transitionCount)
+                    except Exception as e:
+                        print(f"Couldnt get transition because of {e}")
+                    print(replyCountNum,replyCountNum,likeCountNum,transitionCountNum)
+                    tweet_statistics["tweet_like_count"]=likeCountNum
+                    tweet_statistics["tweet_reply_count"]=replyCountNum
+                    tweet_statistics["tweet_retweet_count"]=retweetCountNum
+                    tweet_statistics["tweet_transition_count"]=transitionCountNum
                     fetched_statistics = True
-                except:
-                    print("Cold'nt get reply, retweet, likes ")
-
-                            
+                except selenium.common.exceptions.NoSuchElementException:
+                    print("No such an element at tweet stats")
+                except Exception as e:
+                    print(f"Couldn't get reply, retweet, likes because: {str(e)}")            
                 # print(date,tm, is_a_tweet[0].text.replace('\n',''))
                 if (tweetText != None):
                     foundTweetCount += 1
@@ -71,13 +87,14 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
                     dateFromString = datetime.datetime.strptime(date+" "+tm,"%Y-%m-%d %H:%M:%S.%fZ")
                     username = senderName.text
                     username = username.replace("@","")
+                    # new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S"), 'tweet_status_link':statusLink}
                     new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S")}
+                    if fetched_statistics:
+                        new_tweet = {**new_tweet,**tweet_statistics}
                     tweets_df = pd.concat([tweets_df,pd.DataFrame([new_tweet])],ignore_index = True)
-                    
-            except selenium.common.exceptions.NoSuchElementException:
-                print("No such an element")
-            except Exception:
-                print("An exception happened in parsing tweet")
+            except Exception as e:
+                # print("An exception happened in parsing tweet")
+                print(f"An exception happened in parsing tweet: {str(e)}")
             time.sleep(0.2)
             # time.sleep(1)
         # delete element from HTML
@@ -94,10 +111,15 @@ def GetTweetsFromUser(driver : WebDriver,username : str,onlyuser : bool):
             tweets_df = tweets_df[tweets_df.username==username]
             tweets_df = tweets_df.reset_index(drop=True)
         print(tweets_df.head(10))
-    except:
-        print("An exception occured")
+        return tweets_df
+    except Exception as e:
+        print(f"An exception occured {str(e)}")
 
-GetTweetsFromUser(driver,"elonmusk",False) 
+# GetTweetsFromUser(driver,"elonmusk",False) 
+tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
+tweets_df.to_csv("fetchedTweets.csv",index=False)
+readed_df = pd.read_csv("fetchedTweets.csv")
+print(readed_df.head(10))
 
 def GetTweetsFromURL(driver,url):
     driver.get("https://twitter.com/elonmusk")
