@@ -10,8 +10,10 @@ import pandas as pd
 
 import selenium.webdriver.common
 
-driver = webdriver.GetWebdriver()
-    
+import sys
+
+# driver = webdriver.GetWebdriver()
+
 date_for_deletion = '2022-05-21'
 stop_condition = 5
 def CountFromText(countText:str):
@@ -38,8 +40,8 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
     foundTweetCount=0
 
     # column_names = ['username', 'tweet_text', 'tweet_date']
-    # column_names = ['username', 'tweet_text', 'tweet_date','tweet_like_count','tweet_reply_count','tweet_retweet_count','tweet_transition_count','tweet_status_link']
-    column_names = ['username', 'tweet_text', 'tweet_date','tweet_like_count','tweet_reply_count','tweet_retweet_count','tweet_transition_count']
+    column_names = ['username', 'tweet_text', 'tweet_date','tweet_like_count','tweet_reply_count','tweet_retweet_count','tweet_transition_count','tweet_status_link']
+    # column_names = ['username', 'tweet_text', 'tweet_date','tweet_like_count','tweet_reply_count','tweet_retweet_count','tweet_transition_count']
 
     tweets_df = pd.DataFrame(columns=column_names)
     for i in range(999):
@@ -70,7 +72,7 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
                         transitionCountNum = CountFromText(transitionCount)
                     except Exception as e:
                         print(f"Couldnt get transition because of {e}")
-                    print(replyCountNum,replyCountNum,likeCountNum,transitionCountNum)
+                    # print(replyCountNum,replyCountNum,likeCountNum,transitionCountNum)
                     tweet_statistics["tweet_like_count"]=likeCountNum
                     tweet_statistics["tweet_reply_count"]=replyCountNum
                     tweet_statistics["tweet_retweet_count"]=retweetCountNum
@@ -87,13 +89,12 @@ def ScrapeTweets(driver: WebDriver,stop_condition):
                     dateFromString = datetime.datetime.strptime(date+" "+tm,"%Y-%m-%d %H:%M:%S.%fZ")
                     username = senderName.text
                     username = username.replace("@","")
-                    # new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S"), 'tweet_status_link':statusLink}
-                    new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S")}
+                    new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S"), 'tweet_status_link':statusLink}
+                    # new_tweet = {'username':username,'tweet_text':tweetText.text,'tweet_date':dateFromString.strftime("%Y-%m-%d %H:%M:%S")}
                     if fetched_statistics:
                         new_tweet = {**new_tweet,**tweet_statistics}
                     tweets_df = pd.concat([tweets_df,pd.DataFrame([new_tweet])],ignore_index = True)
             except Exception as e:
-                # print("An exception happened in parsing tweet")
                 print(f"An exception happened in parsing tweet: {str(e)}")
             time.sleep(0.2)
             # time.sleep(1)
@@ -116,13 +117,42 @@ def GetTweetsFromUser(driver : WebDriver,username : str,onlyuser : bool):
         print(f"An exception occured {str(e)}")
 
 # GetTweetsFromUser(driver,"elonmusk",False) 
-tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
-tweets_df.to_csv("fetchedTweets.csv",index=False)
-readed_df = pd.read_csv("fetchedTweets.csv")
-print(readed_df.head(10))
+# tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
+# tweets_df.to_csv("fetchedTweets.csv",index=False)
+# readed_df = pd.read_csv("fetchedTweets.csv")
+# print(readed_df.head(10))
 
 def GetTweetsFromURL(driver,url):
     driver.get("https://twitter.com/elonmusk")
 
+def ScrapeSingleAndSave(driver, username,outputName="fetchedTweets.csv"):
+    tweets_df = GetTweetsFromUser(driver,username,False) 
+    tweets_df.to_csv(outputName,index=False)
+    # readed_df = pd.read_csv(outputName)
+
+def main():
+    driver = webdriver.GetWebdriver()
+
+    command = sys.argv[1]
+
+    if command == 'help':
+        print(""" First argument command : [single, multiple, help] \n Second argument scrape target, if command multiple csv file that contain usernames, if command is single single string of username to be scraped
+          """)
+        return
+
+    usernames = sys.argv[2]
+    
+    if usernames==None:
+
+
+    tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
+    tweets_df.to_csv("fetchedTweets.csv",index=False)
+    readed_df = pd.read_csv("fetchedTweets.csv")
+    print(readed_df.head(10))
+    webdriver.CloseWebdriver(driver)
+
+
+if __name__ == '__main__':
+    main()
 
 

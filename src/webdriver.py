@@ -2,6 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import date, datetime, timedelta
 import sys
@@ -27,4 +28,7 @@ def GetWebdriver():
 
     driver = webdriver.Chrome(chrome_driver_adress,chrome_options=options)
     return driver
+def CloseWebdriver(driver : WebDriver):
+    driver.close()
+    driver.quit()
 
