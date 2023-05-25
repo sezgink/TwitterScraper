@@ -128,10 +128,45 @@ def GetTweetsFromURL(driver,url):
 def ScrapeSingleAndSave(driver, username,outputName="fetchedTweets.csv"):
     tweets_df = GetTweetsFromUser(driver,username,False) 
     tweets_df.to_csv(outputName,index=False)
+    # driver.close()
+    webdriver.CloseWebdriver(driver)
     # readed_df = pd.read_csv(outputName)
+def ReadTxtList(adress):
+    my_file = open(adress, "r")    
+    data = my_file.read()
+    data_into_list = data.split("\n")
+    # printing the data
+    print(data_into_list)
+    my_file.close()
+    return data_into_list
+def ScrapeMultipleAndSave(driver, usernameSource,outputName="fetchedTweets.csv"):
+    fetched_tweets_df = pd.DataFrame()
+    usernameList = ReadTxtList(usernameSource)
+    for username in usernameList:
+        print("Username: "+username)
+        tweets_df = GetTweetsFromUser(driver,username,False) 
+        fetched_tweets_df = pd.concat([fetched_tweets_df,tweets_df],ignore_index=True)
+        # tweets_df.to_csv(outputName,index=False)
+    fetched_tweets_df.to_csv(outputName,index=False)
+    # driver.close()
+    webdriver.CloseWebdriver(driver)
+
+
+def NoArgument(driver):
+    tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
+    tweets_df.to_csv("fetchedTweets.csv",index=False)
+    readed_df = pd.read_csv("fetchedTweets.csv")
+    print(readed_df.head(10))
+    # driver.close()
+    
+    webdriver.CloseWebdriver(driver)
 
 def main():
     driver = webdriver.GetWebdriver()
+
+    if len(sys.argv)<2:
+        NoArgument(driver)
+        return
 
     command = sys.argv[1]
 
@@ -139,18 +174,29 @@ def main():
         print(""" First argument command : [single, multiple, help] \n Second argument scrape target, if command multiple csv file that contain usernames, if command is single single string of username to be scraped
           """)
         return
-
-    usernames = sys.argv[2]
     
+    if len(sys.argv)<3:
+        NoArgument(driver)
+        return
+    
+    usernames = sys.argv[2]
+
     if usernames==None:
+        tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
+        tweets_df.to_csv("fetchedTweets.csv",index=False)
+        # readed_df = pd.read_csv("fetchedTweets.csv")
+        # print(readed_df.head(10))
 
-
-    tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
-    tweets_df.to_csv("fetchedTweets.csv",index=False)
-    readed_df = pd.read_csv("fetchedTweets.csv")
-    print(readed_df.head(10))
-    webdriver.CloseWebdriver(driver)
-
+    if command == 'single':
+        ScrapeSingleAndSave(driver,usernames)
+        return
+    
+    if (command == 'multi') | (command=='multiple'):
+        ScrapeMultipleAndSave(driver,usernames)
+        return
+    
+    
+        # webdriver.CloseWebdriver(driver)
 
 if __name__ == '__main__':
     main()
