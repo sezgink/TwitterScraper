@@ -128,7 +128,6 @@ def GetTweetsFromURL(driver,url):
 def ScrapeSingleAndSave(driver, username,outputName="fetchedTweets.csv"):
     tweets_df = GetTweetsFromUser(driver,username,False) 
     tweets_df.to_csv(outputName,index=False)
-    # driver.close()
     webdriver.CloseWebdriver(driver)
     # readed_df = pd.read_csv(outputName)
 def ReadTxtList(adress):
@@ -148,7 +147,6 @@ def ScrapeMultipleAndSave(driver, usernameSource,outputName="fetchedTweets.csv")
         fetched_tweets_df = pd.concat([fetched_tweets_df,tweets_df],ignore_index=True)
         # tweets_df.to_csv(outputName,index=False)
     fetched_tweets_df.to_csv(outputName,index=False)
-    # driver.close()
     webdriver.CloseWebdriver(driver)
 
 
@@ -157,8 +155,6 @@ def NoArgument(driver):
     tweets_df.to_csv("fetchedTweets.csv",index=False)
     readed_df = pd.read_csv("fetchedTweets.csv")
     print(readed_df.head(10))
-    # driver.close()
-    
     webdriver.CloseWebdriver(driver)
 
 def main():
@@ -194,8 +190,6 @@ def main():
     if (command == 'multi') | (command=='multiple'):
         ScrapeMultipleAndSave(driver,usernames)
         return
-    
-    
         # webdriver.CloseWebdriver(driver)
 
 if __name__ == '__main__':
