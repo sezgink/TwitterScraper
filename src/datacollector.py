@@ -126,9 +126,13 @@ def GetTweetsFromURL(driver,url):
     driver.get("https://twitter.com/elonmusk")
 
 def ScrapeSingleAndSave(driver, username,outputName="fetchedTweets.csv"):
-    tweets_df = GetTweetsFromUser(driver,username,False) 
-    tweets_df.to_csv(outputName,index=False)
-    webdriver.CloseWebdriver(driver)
+    try:
+        tweets_df = GetTweetsFromUser(driver,username,False) 
+        tweets_df.to_csv(outputName,index=False)
+    except Exception as e:
+        print(str(e))
+    finally:
+        webdriver.CloseWebdriver(driver)
     # readed_df = pd.read_csv(outputName)
 def ReadTxtList(adress):
     my_file = open(adress, "r")    
@@ -139,23 +143,30 @@ def ReadTxtList(adress):
     my_file.close()
     return data_into_list
 def ScrapeMultipleAndSave(driver, usernameSource,outputName="fetchedTweets.csv"):
-    fetched_tweets_df = pd.DataFrame()
-    usernameList = ReadTxtList(usernameSource)
-    for username in usernameList:
-        print("Username: "+username)
-        tweets_df = GetTweetsFromUser(driver,username,False) 
-        fetched_tweets_df = pd.concat([fetched_tweets_df,tweets_df],ignore_index=True)
-        # tweets_df.to_csv(outputName,index=False)
-    fetched_tweets_df.to_csv(outputName,index=False)
-    webdriver.CloseWebdriver(driver)
-
+    try:
+        fetched_tweets_df = pd.DataFrame()
+        usernameList = ReadTxtList(usernameSource)
+        for username in usernameList:
+            print("Username: "+username)
+            tweets_df = GetTweetsFromUser(driver,username,False) 
+            fetched_tweets_df = pd.concat([fetched_tweets_df,tweets_df],ignore_index=True)
+            # tweets_df.to_csv(outputName,index=False)
+        fetched_tweets_df.to_csv(outputName,index=False)
+    except Exception as e:
+        print(str(e))
+    finally:
+        webdriver.CloseWebdriver(driver)
 
 def NoArgument(driver):
-    tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
-    tweets_df.to_csv("fetchedTweets.csv",index=False)
-    readed_df = pd.read_csv("fetchedTweets.csv")
-    print(readed_df.head(10))
-    webdriver.CloseWebdriver(driver)
+    try:
+        tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
+        tweets_df.to_csv("fetchedTweets.csv",index=False)
+        readed_df = pd.read_csv("fetchedTweets.csv")
+        print(readed_df.head(10))
+    except Exception as e:
+        print(str(e))
+    finally:
+        webdriver.CloseWebdriver(driver)
 
 def main():
     driver = webdriver.GetWebdriver()
