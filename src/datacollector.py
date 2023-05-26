@@ -187,6 +187,11 @@ def main():
         return
     
     usernames = sys.argv[2]
+    output_filename = "fetchedTweets.csv"
+
+    if len(sys.argv)>=4:
+        output_filename = sys.argv[3]
+
 
     if usernames==None:
         tweets_df = GetTweetsFromUser(driver,"WSJCentralBanks",False) 
@@ -195,11 +200,11 @@ def main():
         # print(readed_df.head(10))
 
     if command == 'single':
-        ScrapeSingleAndSave(driver,usernames)
+        ScrapeSingleAndSave(driver,usernames,output_filename)
         return
     
     if (command == 'multi') | (command=='multiple'):
-        ScrapeMultipleAndSave(driver,usernames)
+        ScrapeMultipleAndSave(driver,usernames,output_filename)
         return
         # webdriver.CloseWebdriver(driver)
 
