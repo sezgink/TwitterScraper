@@ -11,7 +11,6 @@ import pandas as pd
 import selenium.webdriver.common
 
 import sys
-
 # driver = webdriver.GetWebdriver()
 
 date_for_deletion = '2022-05-21'
