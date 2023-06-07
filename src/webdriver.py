@@ -6,14 +6,15 @@ from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import date, datetime, timedelta
 import sys
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import os
 
-load_dotenv()
-chrome_driver_adress = os.environ.get("chromedadress")
+# load_dotenv()
+# chrome_driver_adress = os.environ.get("chromedadress")
 
 tryCounter = 0
 
+webdriver.ChromeOptions()
 def GetWebdriver():
     options = webdriver.ChromeOptions()
     options.add_argument('start-maximized')
@@ -25,8 +26,13 @@ def GetWebdriver():
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-browser-side-navigation')
     options.add_argument('--disable-gpu')
+    
+    # driver = webdriver.Chrome(chrome_driver_adress,chrome_options=options)
+    print("Driver 1")
+    driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub',options=options)
+    # driver.set_timeout(30)
+    print("Driver 2")
 
-    driver = webdriver.Chrome(chrome_driver_adress,chrome_options=options)
     return driver
 def CloseWebdriver(driver : WebDriver):
     driver.close()
