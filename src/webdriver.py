@@ -32,6 +32,7 @@ def GetWebdriver():
     if "seleniumServer" in os.environ:
         selenium_server_url = os.getenv("seleniumServer")
     print("Driver 1")
+    print("Selenium Server URL:",selenium_server_url)
     driver = webdriver.Remote(command_executor=selenium_server_url,options=options)
     # driver.set_timeout(30)
     print("Driver 2")
