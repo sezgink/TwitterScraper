@@ -28,8 +28,11 @@ def GetWebdriver():
     options.add_argument('--disable-gpu')
     
     # driver = webdriver.Chrome(chrome_driver_adress,chrome_options=options)
+    selenium_server_url = 'http://localhost:4444/wd/hub'
+    if "seleniumServer" in os.environ:
+        selenium_server_url = os.getenv("seleniumServer")
     print("Driver 1")
-    driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub',options=options)
+    driver = webdriver.Remote(command_executor=selenium_server_url,options=options)
     # driver.set_timeout(30)
     print("Driver 2")
 
