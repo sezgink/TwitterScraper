@@ -11,6 +11,7 @@ import pandas as pd
 import selenium.webdriver.common
 
 import sys
+import os
 # driver = webdriver.GetWebdriver()
 
 date_for_deletion = '2022-05-21'
@@ -124,9 +125,16 @@ def GetTweetsFromUser(driver : WebDriver,username : str,onlyuser : bool):
 def GetTweetsFromURL(driver,url):
     driver.get("https://twitter.com/elonmusk")
 
+def CheckAndCreateFolder(directory):
+    directory = os.path.dirname("/opt/airflow/data/")
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
 def ScrapeSingleAndSave(driver, username,outputName="fetchedTweets.csv"):
     try:
-        tweets_df = GetTweetsFromUser(driver,username,False) 
+        tweets_df = GetTweetsFromUser(driver,username,False)
+        directory = os.path.dirname(outputName)
+        CheckAndCreateFolder(directory) 
         tweets_df.to_csv(outputName,index=False)
     except Exception as e:
         print(str(e))
@@ -150,6 +158,8 @@ def ScrapeMultipleAndSave(driver, usernameSource,outputName="fetchedTweets.csv")
             tweets_df = GetTweetsFromUser(driver,username,False) 
             fetched_tweets_df = pd.concat([fetched_tweets_df,tweets_df],ignore_index=True)
             # tweets_df.to_csv(outputName,index=False)
+        directory = os.path.dirname(outputName)
+        CheckAndCreateFolder(directory) 
         fetched_tweets_df.to_csv(outputName,index=False)
     except Exception as e:
         print(str(e))
