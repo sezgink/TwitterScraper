@@ -15,7 +15,7 @@ import os
 import logging
 # driver = webdriver.GetWebdriver()
 
-date_for_deletion = '2022-05-21'
+# date_for_deletion = '2022-05-21'
 stop_condition = 5
 def CountFromText(countText:str):
     countText = countText.replace(",","")
