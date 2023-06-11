@@ -12,6 +12,7 @@ import selenium.webdriver.common
 
 import sys
 import os
+import logging
 # driver = webdriver.GetWebdriver()
 
 date_for_deletion = '2022-05-21'
@@ -162,6 +163,7 @@ def ScrapeMultipleAndSave(driver, usernameSource,outputName="fetchedTweets.csv")
         CheckAndCreateFolder(directory) 
         fetched_tweets_df.to_csv(outputName,index=False)
     except Exception as e:
+        logging.error(e)
         print(str(e))
     finally:
         webdriver.CloseWebdriver(driver)
