@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 import sys
 # from dotenv import load_dotenv
 import os
+import requests
 
 # load_dotenv()
 # chrome_driver_adress = os.environ.get("chromedadress")
@@ -31,6 +32,20 @@ def GetWebdriver():
     selenium_server_url = 'http://localhost:4444/wd/hub'
     if "seleniumServer" in os.environ:
         selenium_server_url = os.getenv("seleniumServer")
+
+    #Release past sessions if exits
+    response = requests.get(f'{selenium_server_url}/wd/hub/sessions')
+    sessions = response.json()['value']
+
+    # Delete each session
+    for session in sessions:
+        session_id = session['id']
+        response = requests.delete(f'{selenium_server_url}/wd/hub/session/{session_id}')
+
+        if response.status_code == 200:
+            print(f"Session {session_id} has been deleted successfully.")
+        else:
+            print(f"Failed to delete session {session_id}. Status code: {response.status_code}")
     print("Driver 1")
     print("Selenium Server URL:",selenium_server_url)
     driver = webdriver.Remote(command_executor=selenium_server_url,options=options)
